@@ -39,6 +39,7 @@ function renderData(searchTerm = '') {
     const container = document.getElementById('container');
     const noResultsElem = document.getElementById('noResults');
     const searchStatsElem = document.getElementById('searchStats');
+    const tabWindowCountElem = document.getElementById('tabWindowCount');
 
     // Clear previous content
     container.innerHTML = '';
@@ -196,6 +197,9 @@ function renderData(searchTerm = '') {
     } else {
         noResultsElem.classList.add('hidden');
     }
+
+    // Update tab and window count
+    tabWindowCountElem.textContent = `Displaying ${totalTabsFound} tabs in ${windowIdx} windows`;
 }
 
 function createTabElement(tab, isStandalone = false, searchTerm = '') {

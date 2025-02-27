@@ -91,6 +91,13 @@ h1 {
     color: #666;
 }
 
+.tab-window-count {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1rem;
+    color: #444;
+}
+
 .container {
     display: flex;
     flex-direction: column;
