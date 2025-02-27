@@ -41,6 +41,9 @@ function updateTabWindowCount(totalTabsFound, windowIdx, totalSelectedTabs) {
 }
 
 function renderData(searchTerm = '') {
+    // Deselect all tabs when a new search is started or modified
+    selectNone();
+
     if (!currentData)
         return;
 
