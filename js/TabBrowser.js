@@ -34,7 +34,10 @@ function tabMatchesSearch(tab, searchTerm) {
 
 function updateTabWindowCount(totalTabsFound, windowIdx, totalSelectedTabs) {
     const tabWindowCountElem = document.getElementById('tabWindowCount');
-    tabWindowCountElem.textContent = `Displaying ${totalTabsFound} tabs in ${windowIdx} windows (${totalSelectedTabs} selected)`;
+
+    tabWindowCountElem.textContent = totalSelectedTabs === 0
+        ? `Displaying ${totalTabsFound} tabs in ${windowIdx} windows`
+        : `Displaying ${totalTabsFound} tabs in ${windowIdx} windows (${totalSelectedTabs} selected)`;
 }
 
 function renderData(searchTerm = '') {
@@ -418,6 +421,45 @@ function collapseAll() {
     });
 }
 
+function selectAll() {
+    const windowCheckboxes = document.querySelectorAll('.window-checkbox');
+    windowCheckboxes.forEach(checkbox => {
+        checkbox.checked = true;
+    });
+    const groupCheckboxes = document.querySelectorAll('.group-checkbox');
+    groupCheckboxes.forEach(checkbox => {
+        checkbox.checked = true;
+    });
+    const tabCheckboxes = document.querySelectorAll('.tab-checkbox');
+    tabCheckboxes.forEach(checkbox => {
+        checkbox.checked = true;
+        checkbox.closest('.tab').classList.add('selected');
+    });
+    const totalSelectedTabs = tabCheckboxes.length;
+    const totalTabsFound = document.querySelectorAll('.tab').length;
+    const windowIdx = document.querySelectorAll('.window').length;
+    updateTabWindowCount(totalTabsFound, windowIdx, totalSelectedTabs);
+}
+
+function selectNone() {
+    const windowCheckboxes = document.querySelectorAll('.window-checkbox');
+    windowCheckboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    const groupCheckboxes = document.querySelectorAll('.group-checkbox');
+    groupCheckboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    const tabCheckboxes = document.querySelectorAll('.tab-checkbox');
+    tabCheckboxes.forEach(checkbox => {
+        checkbox.checked = false;
+        checkbox.closest('.tab').classList.remove('selected');
+    });
+    const totalTabsFound = document.querySelectorAll('.tab').length;
+    const windowIdx = document.querySelectorAll('.window').length;
+    updateTabWindowCount(totalTabsFound, windowIdx, 0);
+}
+
 // Initialize
 function initialize() {
     // Set up button handlers
@@ -430,6 +472,8 @@ function initialize() {
     });
     document.getElementById('expandAllBtn').addEventListener('click', expandAll);
     document.getElementById('collapseAllBtn').addEventListener('click', collapseAll);
+    document.getElementById('selectAllBtn').addEventListener('click', selectAll);
+    document.getElementById('selectNoneBtn').addEventListener('click', selectNone);
 
     // Set up search functionality
     const searchBar = document.getElementById('searchBar');
