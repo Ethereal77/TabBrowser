@@ -219,6 +219,7 @@ function renderData(searchTerm = '') {
 function createTabElement(tab, isStandalone = false, searchTerm = '', windowId = null, groupId = null) {
     const tabElem = document.createElement('div');
     tabElem.className = `tab ${isStandalone ? 'standalone-tab' : ''}`;
+    tabElem.setAttribute('data-tab-id', tab.id);
     if (windowId) tabElem.setAttribute('data-window-id', windowId);
     if (groupId) tabElem.setAttribute('data-group-id', groupId);
 
@@ -258,7 +259,7 @@ function createTabElement(tab, isStandalone = false, searchTerm = '', windowId =
     }
 
     tabElem.innerHTML = `
-        <input type="checkbox" class="tab-checkbox" data-tab-id="${tab.id}">
+        <input type="checkbox" class="tab-checkbox">
         <div class="tab-icon"></div>
         <div class="tab-title" title="${tab.title || 'Untitled'}">${highlightedTitle}</div>
         <div class="tab-url" title="${tab.url || ''}">${urlHtml}</div>
@@ -446,6 +447,44 @@ function selectNone() {
     updateTabWindowCount(totalTabsFound, windowIdx, 0);
 }
 
+function deleteSelectedTabs() {
+    const selectedTabCheckboxes = document.querySelectorAll('.tab-checkbox:checked');
+    selectedTabCheckboxes.forEach(checkbox => {
+        const tabElem = checkbox.closest('.tab');
+        const windowId = tabElem.getAttribute('data-window-id');
+        const groupId = tabElem.getAttribute('data-group-id');
+        const tabId = tabElem.getAttribute('data-tab-id');
+
+        // Remove tab from currentData
+        delete currentData[0].windows[windowId][tabId];
+
+        // Remove tab element from DOM
+        tabElem.remove();
+
+        // If no more tabs in the group, remove the group
+        if (groupId) {
+            const groupElem = document.querySelector(`.group[data-group-id="${groupId}"]`);
+            const groupTabs = groupElem.querySelectorAll('.tab');
+            if (groupTabs.length === 0) {
+                groupElem.remove();
+            }
+        }
+
+        // If no more tabs in the window, remove the window
+        if (windowId) {
+            const windowElem = document.querySelector(`.window[data-window-id="${windowId}"]`);
+            const windowTabs = windowElem.querySelectorAll('.tab');
+            if (windowTabs.length === 0) {
+                delete currentData[0].windows[windowId];
+                windowElem.remove();
+            }
+        }
+    });
+
+    // Re-render data to update counts and visibility
+    renderData();
+}
+
 // Initialize
 function initialize() {
     // Set up button handlers
@@ -460,6 +499,7 @@ function initialize() {
     document.getElementById('collapseAllBtn').addEventListener('click', collapseAll);
     document.getElementById('selectAllBtn').addEventListener('click', selectAll);
     document.getElementById('selectNoneBtn').addEventListener('click', selectNone);
+    document.getElementById('deleteSelectedBtn').addEventListener('click', deleteSelectedTabs);
 
     // Set up search functionality
     const searchBar = document.getElementById('searchBar');

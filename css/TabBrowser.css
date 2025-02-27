@@ -325,7 +325,7 @@ h1 {
 
 .toolbar {
     margin-bottom: 15px;
-    text-align: right;
+    text-align: center;
 }
 .window-header input[type="checkbox"],
 .group-header input[type="checkbox"],
