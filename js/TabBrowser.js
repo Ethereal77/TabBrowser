@@ -523,6 +523,47 @@ function addNewTab() {
     renderData();
 }
 
+function openAddTabModal() {
+    const modal = document.getElementById('addTabModal');
+    const windowSelect = document.getElementById('windowSelect');
+    windowSelect.innerHTML = '';
+
+    const windowIds = Object.keys(currentData[0].windows);
+    windowIds.forEach(windowId => {
+        const option = document.createElement('option');
+        option.value = windowId;
+        option.textContent = `Window ${windowId}`;
+        windowSelect.appendChild(option);
+    });
+
+    modal.classList.remove('hidden');
+}
+
+function closeAddTabModal() {
+    const modal = document.getElementById('addTabModal');
+    modal.classList.add('hidden');
+}
+
+function handleAddTabFormSubmit(event) {
+    event.preventDefault();
+
+    const tabName = document.getElementById('tabName').value;
+    const tabUrl = document.getElementById('tabUrl').value;
+    const windowId = document.getElementById('windowSelect').value;
+
+    const newTabId = `tab${Date.now()}`;
+    currentData[0].windows[windowId][newTabId] = {
+        id: newTabId,
+        index: Object.keys(currentData[0].windows[windowId]).length,
+        lastAccessed: Date.now(),
+        title: tabName,
+        url: tabUrl
+    };
+
+    closeAddTabModal();
+    renderData();
+}
+
 // Initialize
 function initialize() {
     // Set up button handlers
@@ -539,7 +580,9 @@ function initialize() {
     document.getElementById('selectNoneBtn').addEventListener('click', selectNone);
     document.getElementById('deleteSelectedBtn').addEventListener('click', deleteSelectedTabs);
     document.getElementById('addWindowBtn').addEventListener('click', addNewWindow);
-    document.getElementById('addTabBtn').addEventListener('click', addNewTab);
+    document.getElementById('addTabBtn').addEventListener('click', openAddTabModal);
+    document.getElementById('closeAddTabModal').addEventListener('click', closeAddTabModal);
+    document.getElementById('addTabForm').addEventListener('submit', handleAddTabFormSubmit);
 
     // Set up search functionality
     const searchBar = document.getElementById('searchBar');

@@ -75,6 +75,28 @@
         </div>
     </div>
 
+    <div id="addTabModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close" id="closeAddTabModal">&times;</span>
+            <h2>Add New Tab</h2>
+            <form id="addTabForm">
+                <label>
+                    Tab Name:
+                    <input type="text" id="tabName" name="tabName" required>
+                </label>
+                <label>
+                    Tab URL:
+                    <input type="url" id="tabUrl" name="tabUrl" required>
+                </label>
+                <label>
+                    Select Window:
+                    <select id="windowSelect" name="windowSelect" required></select>
+                </label>
+                <button type="submit" class="button">Add Tab</button>
+            </form>
+        </div>
+    </div>
+
     <script type="module" src="js/TabBrowser.js"></script>
 </body>
 
