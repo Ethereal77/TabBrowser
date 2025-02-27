@@ -291,6 +291,15 @@ h1 {
     background-color: #e6f4ea;
 }
 
+.window-header.muted {
+    background-color: #e0e0e0;
+    color: #999;
+
+    .chevron {
+        opacity: 0;
+    }
+}
+
 /* Group colors */
 .group-color-1 .group-header {
     background-color: #fbbc04;

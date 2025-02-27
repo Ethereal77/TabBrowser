@@ -185,14 +185,18 @@ function renderData(searchTerm = '') {
             }
         });
 
-        // Only add the window if it has visible tabs
-        if (windowHasVisibleTabs) {
+        // Only add the window if it has visible tabs or no tabs at all
+        if (windowHasVisibleTabs || Object.keys(tabs).length === 0) {
             windowElem.appendChild(windowHeader);
-            windowElem.appendChild(windowContent);
+            if (windowHasVisibleTabs) {
+                windowElem.appendChild(windowContent);
+            } else {
+                windowHeader.classList.add('muted');
+            }
             container.appendChild(windowElem);
 
             // Auto-expand windows when searching
-            if (searchTerm) {
+            if (searchTerm && windowHasVisibleTabs) {
                 windowContent.classList.remove('collapsed');
                 windowHeader.querySelector('.chevron').classList.add('up');
             }
