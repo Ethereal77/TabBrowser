@@ -370,3 +370,11 @@ h1 {
 .icon-delete-selected::before {
     content: "\1F5D1"; /* Trash can icon */
 }
+
+.icon-add-tab::before {
+    content: "\2795"; /* Heavy plus sign icon */
+}
+
+.icon-add-window::before {
+    content: "\1F5D8"; /* New window icon */
+}

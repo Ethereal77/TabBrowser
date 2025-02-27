@@ -488,6 +488,41 @@ function deleteSelectedTabs() {
     renderData();
 }
 
+function addNewWindow() {
+    if (!currentData) {
+        alert('Please load data first.');
+        return;
+    }
+
+    const newWindowId = `window${Date.now()}`;
+    currentData[0].windows[newWindowId] = {};
+    renderData();
+}
+
+function addNewTab() {
+    if (!currentData) {
+        alert('Please load data first.');
+        return;
+    }
+
+    const windowIds = Object.keys(currentData[0].windows);
+    if (windowIds.length === 0) {
+        alert('Please add a window first.');
+        return;
+    }
+
+    const windowId = windowIds[0]; // Add to the first window for simplicity
+    const newTabId = `tab${Date.now()}`;
+    currentData[0].windows[windowId][newTabId] = {
+        id: newTabId,
+        index: Object.keys(currentData[0].windows[windowId]).length,
+        lastAccessed: Date.now(),
+        title: 'New Tab',
+        url: 'about:blank'
+    };
+    renderData();
+}
+
 // Initialize
 function initialize() {
     // Set up button handlers
@@ -503,6 +538,8 @@ function initialize() {
     document.getElementById('selectAllBtn').addEventListener('click', selectAll);
     document.getElementById('selectNoneBtn').addEventListener('click', selectNone);
     document.getElementById('deleteSelectedBtn').addEventListener('click', deleteSelectedTabs);
+    document.getElementById('addWindowBtn').addEventListener('click', addNewWindow);
+    document.getElementById('addTabBtn').addEventListener('click', addNewTab);
 
     // Set up search functionality
     const searchBar = document.getElementById('searchBar');
