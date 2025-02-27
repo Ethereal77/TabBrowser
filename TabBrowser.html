@@ -18,8 +18,56 @@
 
         h1 {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             color: #444;
+        }
+
+        .input-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .json-input {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            font-family: monospace;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            resize: vertical;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .button {
+            padding: 8px 16px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #3367d6;
+        }
+
+        .button.secondary {
+            background-color: #f1f1f1;
+            color: #333;
+        }
+
+        .button.secondary:hover {
+            background-color: #e0e0e0;
         }
 
         .search-container {
@@ -175,6 +223,23 @@
             color: #666;
         }
 
+        .error-message {
+            color: #d32f2f;
+            background-color: #ffebee;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.1rem;
+            color: #666;
+            display: none;
+        }
+
         /* Window colors */
         .window-color-1 .window-header {
             background-color: #4285f4;
@@ -221,23 +286,59 @@
         .group-color-3 .group-content {
             background-color: #f3e5f5;
         }
+
+        .visualization-section {
+            display: none;
+        }
+
+        .expand-collapse-all {
+            margin-bottom: 15px;
+            text-align: right;
+        }
     </style>
 </head>
 
 <body>
-    <h1>Browser Windows & Tabs</h1>
+    <h1>Browser Windows & Tabs Visualization</h1>
 
-    <div class="search-container">
-        <input type="text" id="searchBar" class="search-bar" placeholder="Search for tabs by title or URL...">
+    <div class="input-section" id="inputSection">
+        <h2>Enter Browser Data</h2>
+        <p>Paste your JSON data below. The structure should match the example format shown.</p>
+        <div class="error-message" id="errorMessage"></div>
+        <textarea id="jsonInput" class="json-input"
+            placeholder='Enter JSON with the structure: [{"windows": {"windowId": {"tabId": {"id": number, "index": number, "lastAccessed": number, "title": string, "url": string, "groupId"?: number}, ...}, ...}}]'></textarea>
+        <div class="button-group">
+            <button id="loadBtn" class="button">Load Data</button>
+            <button id="loadSampleBtn" class="button secondary">Load Sample Data</button>
+            <button id="clearBtn" class="button secondary">Clear</button>
+        </div>
     </div>
 
-    <div id="searchStats" class="search-stats"></div>
+    <div id="loadingIndicator" class="loading">Loading data...</div>
 
-    <div class="container" id="container"></div>
-    <div id="noResults" class="no-results hidden">No tabs match your search.</div>
+    <div class="visualization-section" id="visualizationSection">
+        <div class="expand-collapse-all">
+            <button id="expandAllBtn" class="button secondary">Expand All</button>
+            <button id="collapseAllBtn" class="button secondary">Collapse All</button>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="searchBar" class="search-bar" placeholder="Search for tabs by title or URL...">
+        </div>
+
+        <div id="searchStats" class="search-stats"></div>
+
+        <div class="container" id="container"></div>
+        <div id="noResults" class="no-results hidden">No tabs match your search.</div>
+
+        <div class="button-group" style="margin-top: 20px;">
+            <button id="backToInput" class="button secondary">Back to Input</button>
+        </div>
+    </div>
 
     <script>
-        const data = [
+        // Sample data to load if requested
+        const sampleData = [
             {
                 "windows": {
                     "2104794959": {
@@ -271,81 +372,6 @@
                             "lastAccessed": 1729944862470.103,
                             "title": "Chairs too far away from tables T_T - Conan Exiles / PC Discussion - Funcom Forums",
                             "url": "https://forums.funcom.com/t/chairs-too-far-away-from-tables-t-t/265522",
-                        },
-                        "2104332050": {
-                            "groupId": 1777522509,
-                            "id": 2104332050,
-                            "index": 247,
-                            "lastAccessed": 1729944886931.979,
-                            "title": "Items disappearing from inventory? - Conan Exiles / General Discussion - Funcom Forums",
-                            "url": "https://forums.funcom.com/t/items-disappearing-from-inventory/265462",
-                        },
-                        "2104332059": {
-                            "groupId": 1777522509,
-                            "id": 2104332059,
-                            "index": 249,
-                            "lastAccessed": 1729970930602.618,
-                            "title": "Redeemed Armour Recipe missing - PC Discussion / PC Bug Reports - Funcom Forums",
-                            "url": "https://forums.funcom.com/t/redeemed-armour-recipe-missing/265332/4",
-                        },
-                        "2104332086": {
-                            "groupId": 1777522509,
-                            "id": 2104332086,
-                            "index": 250,
-                            "lastAccessed": 1729970973527.503,
-                            "title": "Fashion Exiles! Let's see those outfits! ~ Vanilla only! - General Discussion / Creative Corner - Funcom Forums",
-                            "url": "https://forums.funcom.com/t/fashion-exiles-lets-see-those-outfits-vanilla-only/234664/72",
-                        },
-                        "2104332125": {
-                            "groupId": 1777522509,
-                            "id": 2104332125,
-                            "index": 251,
-                            "lastAccessed": 1729970970598.415,
-                            "title": "Xevyr's guide to Thralls - General Discussion / Creative Corner - Funcom Forums",
-                            "url": "https://forums.funcom.com/t/xevyrs-guide-to-thralls/249258",
-                        },
-                        "2104332182": {
-                            "id": 2104332182,
-                            "index": 253,
-                            "lastAccessed": 1729943261421.352,
-                            "title": "Página de búsqueda | Glovo",
-                            "url": "https://glovoapp.com/es/es/madrid/search-glovo/tarta%20cumplea%C3%B1os",
-                        },
-                        "2104332205": {
-                            "groupId": 1777522509,
-                            "id": 2104332205,
-                            "index": 248,
-                            "lastAccessed": 1729968920195.504,
-                            "title": "Age of Heroes Known Issues: Barkeepers, Crafters, Oh My - General Discussion / News and Announcements - Funcom Forums",
-                            "url": "https://forums.funcom.com/t/age-of-heroes-known-issues-barkeepers-crafters-oh-my/264570/326",
-                        },
-                        "2104332870": {
-                            "id": 2104332870,
-                            "index": 0,
-                            "lastAccessed": 1727531483687.389,
-                            "title": "💤 (82) Alex (según la ciencia) - YouTube",
-                            "url": "https://www.youtube.com/@AlexSegunlaciencia/videos",
-                        },
-                        "2104332873": {
-                            "id": 2104332873,
-                            "index": 1,
-                            "lastAccessed": 1712782341080.224,
-                            "title": "Harvard Business Review - YouTube",
-                            "url": "https://www.youtube.com/@harvardbusinessreview/videos",
-                        },
-                        "2104332876": {
-                            "id": 2104332876,
-                            "index": 2,
-                            "lastAccessed": 1712782627456.452,
-                            "title": "ByteByteGo - YouTube",
-                            "url": "https://www.youtube.com/@ByteByteGo/videos",
-                        },
-                        "2104332879": {
-                            "id": 2104332879,
-                            "index": 3,
-                            "lastAccessed": 1714222829310.07,
-                            "title": "Historia Militum - YouTube",
-                            "url": "https://www.youtube.com/@HistoriaMilitum/videos",
                         }
                     },
                     "2104794961": {
@@ -362,25 +388,14 @@
                             "lastAccessed": 1712077091523.49,
                             "title": "WARNO Steam Key for PC - Buy now",
                             "url": "https://uk.gamesplanet.com/game/warno-steam-key--5471-1?utm_campaign=weekly&utm_content=toptitle&utm_medium=email&utm_source=2022-01-21",
-                        },
-                        "2104333605": {
-                            "id": 2104333605,
-                            "index": 1,
-                            "lastAccessed": 1712077091559.031,
-                            "title": "Advanced Tactics: Gold - Game - Matrix Games",
-                            "url": "https://www.matrixgames.com/game/advanced-tactics-gold?utm_source=Matrix+Games+Master&utm_campaign=5c513a25d5-EMAIL_CAMPAIGN_22.04.22_MatrixGames&utm_medium=email&utm_term=0_d2dfdfd653-5c513a25d5-91521653",
-                        },
-                        "2104333608": {
-                            "id": 2104333608,
-                            "index": 2,
-                            "lastAccessed": 1712077091564.394,
-                            "title": "Panzer Corps 2 - Game - Matrix Games",
-                            "url": "https://www.matrixgames.com/game/panzer-corps-2",
                         }
                     }
                 }
             }
         ];
+
+        // Global variable to hold the current data
+        let currentData = null;
 
         function formatTimestamp(timestamp) {
             if (!timestamp) return '';
@@ -390,9 +405,9 @@
 
         // Helper function to highlight the matching text
         function highlightText(text, searchTerm) {
-            if (!searchTerm) return text;
+            if (!searchTerm || !text) return text || '';
 
-            const regex = new RegExp(`(${searchTerm})`, 'gi');
+            const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
             return text.replace(regex, '<span class="highlight">$1</span>');
         }
 
@@ -402,12 +417,14 @@
 
             const searchLower = searchTerm.toLowerCase();
             return (
-                tab.title.toLowerCase().includes(searchLower) ||
-                tab.url.toLowerCase().includes(searchLower)
+                (tab.title && tab.title.toLowerCase().includes(searchLower)) ||
+                (tab.url && tab.url.toLowerCase().includes(searchLower))
             );
         }
 
         function renderData(searchTerm = '') {
+            if (!currentData) return;
+
             const container = document.getElementById('container');
             const noResultsElem = document.getElementById('noResults');
             const searchStatsElem = document.getElementById('searchStats');
@@ -416,7 +433,7 @@
             container.innerHTML = '';
 
             // Process data
-            const windows = data[0].windows;
+            const windows = currentData[0].windows;
             let windowIdx = 0;
             let totalTabsFound = 0;
             let totalTabs = 0;
@@ -575,23 +592,114 @@
             tabElem.className = `tab ${isStandalone ? 'standalone-tab' : ''}`;
 
             // Highlight the matching text parts if there's a search term
-            const highlightedTitle = highlightText(tab.title, searchTerm);
-            const displayUrl = tab.url.length > 40 ? tab.url.substring(0, 40) + '...' : tab.url;
+            const highlightedTitle = highlightText(tab.title || 'Untitled', searchTerm);
+            const displayUrl = tab.url ? (tab.url.length > 40 ? tab.url.substring(0, 40) + '...' : tab.url) : 'No URL';
             const highlightedUrl = highlightText(displayUrl, searchTerm);
 
             tabElem.innerHTML = `
         <div class="tab-icon"></div>
-        <div class="tab-title" title="${tab.title}">${highlightedTitle}</div>
-        <div class="tab-url" title="${tab.url}">${highlightedUrl}</div>
+        <div class="tab-title" title="${tab.title || 'Untitled'}">${highlightedTitle}</div>
+        <div class="tab-url" title="${tab.url || ''}">${highlightedUrl}</div>
         <div class="timestamp">${formatTimestamp(tab.lastAccessed)}</div>
       `;
 
             return tabElem;
         }
 
+        function validateAndLoadData() {
+            const jsonInput = document.getElementById('jsonInput').value.trim();
+            const errorMessageElem = document.getElementById('errorMessage');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+
+            // Clear previous error
+            errorMessageElem.style.display = 'none';
+
+            if (!jsonInput) {
+                errorMessageElem.textContent = 'Please enter JSON data.';
+                errorMessageElem.style.display = 'block';
+                return;
+            }
+
+            try {
+                loadingIndicator.style.display = 'block';
+
+                // Use setTimeout to allow the loading indicator to render before processing
+                setTimeout(() => {
+                    const data = JSON.parse(jsonInput);
+
+                    // Validate basic structure
+                    if (!Array.isArray(data) || !data[0] || !data[0].windows) {
+                        throw new Error('Invalid data format. Expected an array with a "windows" object.');
+                    }
+
+                    // Update global data
+                    currentData = data;
+
+                    // Switch to visualization section
+                    document.getElementById('inputSection').style.display = 'none';
+                    document.getElementById('visualizationSection').style.display = 'block';
+
+                    // Render the data
+                    renderData();
+
+                    // Hide loading indicator
+                    loadingIndicator.style.display = 'none';
+                }, 10);
+
+            } catch (error) {
+                loadingIndicator.style.display = 'none';
+                errorMessageElem.textContent = `Error: ${error.message}. Please check your JSON format.`;
+                errorMessageElem.style.display = 'block';
+            }
+        }
+
+        function loadSampleData() {
+            document.getElementById('jsonInput').value = JSON.stringify(sampleData, null, 2);
+        }
+
+        function clearInput() {
+            document.getElementById('jsonInput').value = '';
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        function expandAll() {
+            const collapseElements = document.querySelectorAll('.window-content, .group-content');
+            const chevrons = document.querySelectorAll('.chevron');
+
+            collapseElements.forEach(elem => {
+                elem.classList.remove('collapsed');
+            });
+
+            chevrons.forEach(chevron => {
+                chevron.classList.add('up');
+            });
+        }
+
+        function collapseAll() {
+            const collapseElements = document.querySelectorAll('.window-content, .group-content');
+            const chevrons = document.querySelectorAll('.chevron');
+
+            collapseElements.forEach(elem => {
+                elem.classList.add('collapsed');
+            });
+
+            chevrons.forEach(chevron => {
+                chevron.classList.remove('up');
+            });
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            renderData();
+            // Set up button handlers
+            document.getElementById('loadBtn').addEventListener('click', validateAndLoadData);
+            document.getElementById('loadSampleBtn').addEventListener('click', loadSampleData);
+            document.getElementById('clearBtn').addEventListener('click', clearInput);
+            document.getElementById('backToInput').addEventListener('click', () => {
+                document.getElementById('inputSection').style.display = 'block';
+                document.getElementById('visualizationSection').style.display = 'none';
+            });
+            document.getElementById('expandAllBtn').addEventListener('click', expandAll);
+            document.getElementById('collapseAllBtn').addEventListener('click', collapseAll);
 
             // Set up search functionality
             const searchBar = document.getElementById('searchBar');
