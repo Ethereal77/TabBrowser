@@ -59,15 +59,18 @@ function renderData(searchTerm = '') {
         // Create window container
         const windowElem = document.createElement('div');
         windowElem.className = `window ${windowColorClass}`;
+        windowElem.setAttribute('data-window-id', windowId);
 
-        // Add window header
+        // Add window header with checkbox
         const windowHeader = document.createElement('div');
         windowHeader.className = 'window-header';
         windowHeader.innerHTML = `
-                    <div>Window ${windowIdx} (ID: ${windowId})</div>
-                    <div class="chevron">▼</div>
-                `;
-        windowHeader.addEventListener('click', () => {
+            <input type="checkbox" class="window-checkbox">
+            <div>Window ${windowIdx} (ID: ${windowId})</div>
+            <div class="chevron">▼</div>
+        `;
+        windowHeader.addEventListener('click', (e) => {
+            if (e.target.classList.contains('window-checkbox')) return;
             const content = windowHeader.nextElementSibling;
             content.classList.toggle('collapsed');
             const chevron = windowHeader.querySelector('.chevron');
@@ -105,14 +108,18 @@ function renderData(searchTerm = '') {
 
             const groupElem = document.createElement('div');
             groupElem.className = `group ${groupColorClass}`;
+            groupElem.setAttribute('data-group-id', groupId);
 
+            // Add group header with checkbox
             const groupHeader = document.createElement('div');
             groupHeader.className = 'group-header';
             groupHeader.innerHTML = `
-                        <div>Group (ID: ${groupId})</div>
-                        <div class="chevron">▼</div>
-                    `;
-            groupHeader.addEventListener('click', () => {
+                <input type="checkbox" class="group-checkbox">
+                <div>Group (ID: ${groupId})</div>
+                <div class="chevron">▼</div>
+            `;
+            groupHeader.addEventListener('click', (e) => {
+                if (e.target.classList.contains('group-checkbox')) return;
                 const content = groupHeader.nextElementSibling;
                 content.classList.toggle('collapsed');
                 const chevron = groupHeader.querySelector('.chevron');
@@ -135,7 +142,7 @@ function renderData(searchTerm = '') {
                     groupHasVisibleTabs = true;
                     windowHasVisibleTabs = true;
 
-                    const tabElem = createTabElement(tab, false, searchTerm);
+                    const tabElem = createTabElement(tab, false, searchTerm, windowId, groupId);
                     groupContent.appendChild(tabElem);
                 }
             });
@@ -163,7 +170,7 @@ function renderData(searchTerm = '') {
                 totalTabsFound++;
                 windowHasVisibleTabs = true;
 
-                const tabElem = createTabElement(tab, true, searchTerm);
+                const tabElem = createTabElement(tab, true, searchTerm, windowId);
                 windowContent.appendChild(tabElem);
             }
         });
@@ -202,9 +209,11 @@ function renderData(searchTerm = '') {
     tabWindowCountElem.textContent = `Displaying ${totalTabsFound} tabs in ${windowIdx} windows`;
 }
 
-function createTabElement(tab, isStandalone = false, searchTerm = '') {
+function createTabElement(tab, isStandalone = false, searchTerm = '', windowId = null, groupId = null) {
     const tabElem = document.createElement('div');
     tabElem.className = `tab ${isStandalone ? 'standalone-tab' : ''}`;
+    if (windowId) tabElem.setAttribute('data-window-id', windowId);
+    if (groupId) tabElem.setAttribute('data-group-id', groupId);
 
     // Highlight the matching text parts if there's a search term
     const highlightedTitle = highlightText(tab.title || 'Untitled', searchTerm);
@@ -242,11 +251,12 @@ function createTabElement(tab, isStandalone = false, searchTerm = '') {
     }
 
     tabElem.innerHTML = `
-                <div class="tab-icon"></div>
-                <div class="tab-title" title="${tab.title || 'Untitled'}">${highlightedTitle}</div>
-                <div class="tab-url" title="${tab.url || ''}">${urlHtml}</div>
-                <div class="timestamp">${formatTimestamp(tab.lastAccessed)}</div>
-            `;
+        <input type="checkbox" class="tab-checkbox" data-tab-id="${tab.id}">
+        <div class="tab-icon"></div>
+        <div class="tab-title" title="${tab.title || 'Untitled'}">${highlightedTitle}</div>
+        <div class="tab-url" title="${tab.url || ''}">${urlHtml}</div>
+        <div class="timestamp">${formatTimestamp(tab.lastAccessed)}</div>
+    `;
 
     return tabElem;
 }
@@ -430,6 +440,30 @@ function initialize() {
         if (e.key === 'Escape') {
             searchBar.value = '';
             renderData();
+        }
+    });
+
+    document.addEventListener('change', (e) => {
+        if (e.target.classList.contains('window-checkbox')) {
+            const windowId = e.target.closest('.window').dataset.windowId;
+            const checked = e.target.checked;
+            document.querySelectorAll(`.window[data-window-id="${windowId}"] .group-checkbox`).forEach(checkbox => {
+                checkbox.checked = checked;
+            });
+            document.querySelectorAll(`.tab[data-window-id="${windowId}"] .tab-checkbox`).forEach(checkbox => {
+                checkbox.checked = checked;
+                checkbox.closest('.tab').classList.toggle('selected', checked);
+            });
+        } else if (e.target.classList.contains('group-checkbox')) {
+            const groupId = e.target.closest('.group').dataset.groupId;
+            const checked = e.target.checked;
+            document.querySelectorAll(`.tab[data-group-id="${groupId}"] .tab-checkbox`).forEach(checkbox => {
+                checkbox.checked = checked;
+                checkbox.closest('.tab').classList.toggle('selected', checked);
+            });
+        } else if (e.target.classList.contains('tab-checkbox')) {
+            const checked = e.target.checked;
+            e.target.closest('.tab').classList.toggle('selected', checked);
         }
     });
 }

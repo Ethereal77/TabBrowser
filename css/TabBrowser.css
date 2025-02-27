@@ -157,6 +157,10 @@ h1 {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+.tab.selected {
+    background-color: #d1e7fd;
+    border: 2px solid #4285f4;
+}
 
 .tab-icon {
     margin-right: 10px;
@@ -322,4 +326,22 @@ h1 {
 .expand-collapse-all {
     margin-bottom: 15px;
     text-align: right;
+}
+.window-header input[type="checkbox"],
+.group-header input[type="checkbox"],
+.tab input[type="checkbox"] {
+    margin-right: 10px;
+    width: 18px;
+    height: 18px;
+    accent-color: #4285f4;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.window-header input[type="checkbox"]:hover,
+.group-header input[type="checkbox"]:hover,
+.tab input[type="checkbox"]:hover {
+    border-color: #4285f4;
 }
