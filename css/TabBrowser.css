@@ -327,6 +327,7 @@ h1 {
     margin-bottom: 15px;
     text-align: center;
 }
+
 .window-header input[type="checkbox"],
 .group-header input[type="checkbox"],
 .tab input[type="checkbox"] {
@@ -344,4 +345,28 @@ h1 {
 .group-header input[type="checkbox"]:hover,
 .tab input[type="checkbox"]:hover {
     border-color: #4285f4;
+}
+
+.icon {
+    margin-right: 8px;
+}
+
+.icon-select-all::before {
+    content: "\2714"; /* Check mark icon */
+}
+
+.icon-select-none::before {
+    content: "\2716"; /* Cross mark icon */
+}
+
+.icon-expand-all::before {
+    content: "\25B6"; /* Right-pointing triangle icon */
+}
+
+.icon-collapse-all::before {
+    content: "\25BC"; /* Down-pointing triangle icon */
+}
+
+.icon-delete-selected::before {
+    content: "\1F5D1"; /* Trash can icon */
 }
