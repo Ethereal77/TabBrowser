@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browser Windows & Tabs Visualization</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #444;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .window {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .window-header {
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .window-content {
+            padding: 0 15px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .group {
+            border-radius: 6px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        .group-header {
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .group-content {
+            padding: 0 10px 10px;
+        }
+
+        .tab {
+            padding: 8px 15px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .tab-icon {
+            margin-right: 10px;
+            width: 16px;
+            height: 16px;
+            background-color: #ccc;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .tab-title {
+            flex-grow: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .tab-url {
+            color: #666;
+            font-size: 0.85em;
+            margin-left: 10px;
+            max-width: 400px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .chevron {
+            transition: transform 0.3s ease;
+        }
+
+        .chevron.up {
+            transform: rotate(180deg);
+        }
+
+        .collapsed {
+            display: none;
+        }
+
+        .standalone-tab {
+            margin-left: 0;
+        }
+
+        .timestamp {
+            font-size: 0.8em;
+            color: #666;
+            margin-left: 10px;
+        }
+
+        /* Window colors */
+        .window-color-1 .window-header {
+            background-color: #4285f4;
+            color: white;
+        }
+
+        .window-color-1 .window-content {
+            background-color: #e8f0fe;
+        }
+
+        .window-color-2 .window-header {
+            background-color: #34a853;
+            color: white;
+        }
+
+        .window-color-2 .window-content {
+            background-color: #e6f4ea;
+        }
+
+        /* Group colors */
+        .group-color-1 .group-header {
+            background-color: #fbbc04;
+            color: #333;
+        }
+
+        .group-color-1 .group-content {
+            background-color: #fff8e1;
+        }
+
+        .group-color-2 .group-header {
+            background-color: #ea4335;
+            color: white;
+        }
+
+        .group-color-2 .group-content {
+            background-color: #fdede9;
+        }
+
+        .group-color-3 .group-header {
+            background-color: #9c27b0;
+            color: white;
+        }
+
+        .group-color-3 .group-content {
+            background-color: #f3e5f5;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Browser Windows & Tabs</h1>
+    <div class="container" id="container"></div>
+
+    <script>
+        const data = [
+            {
+                "windows": {
+                    "2104794959": {
+                        "2104331965": {
+                            "id": 2104331965,
+                            "index": 243,
+                            "lastAccessed": 1729971922909.627,
+                            "title": "login.steampowered.com",
+                            "url": "https://login.steampowered.com/jwt/refresh?redir=https%3A%2F%2Fsteamcommunity.com%2Fapp%2F440900%2Fdiscussions%2F0%2F4700161192391741362%2F%3Fctp%3D3",
+                        },
+                        "2104331989": {
+                            "groupId": 1777522509,
+                            "id": 2104331989,
+                            "index": 244,
+                            "lastAccessed": 1729971913865.529,
+                            "title": "Freya 's quest line is bugged - PlayStation Discussion / PlayStation Bug Reports - Funcom Forums",
+                            "url": "https://forums.funcom.com/t/freya-s-quest-line-is-bugged/264869/23",
+                        },
+                        "2104332016": {
+                            "groupId": 1777522509,
+                            "id": 2104332016,
+                            "index": 245,
+                            "lastAccessed": 1729971920091.137,
+                            "title": "Drowned Vault Armors deleted and missing from the game - PC Discussion / PC Bug Reports - Funcom Forums",
+                            "url": "https://forums.funcom.com/t/drowned-vault-armors-deleted-and-missing-from-the-game/264514/8",
+                        },
+                        "2104332038": {
+                            "groupId": 1777522509,
+                            "id": 2104332038,
+                            "index": 246,
+                            "lastAccessed": 1729944862470.103,
+                            "title": "Chairs too far away from tables T_T - Conan Exiles / PC Discussion - Funcom Forums",
+                            "url": "https://forums.funcom.com/t/chairs-too-far-away-from-tables-t-t/265522",
+                        },
+                        "2104332050": {
+                            "groupId": 1777522509,
+                            "id": 2104332050,
+                            "index": 247,
+                            "lastAccessed": 1729944886931.979,
+                            "title": "Items disappearing from inventory? - Conan Exiles / General Discussion - Funcom Forums",
+                            "url": "https://forums.funcom.com/t/items-disappearing-from-inventory/265462",
+                        },
+                        "2104332059": {
+                            "groupId": 1777522509,
+                            "id": 2104332059,
+                            "index": 249,
+                            "lastAccessed": 1729970930602.618,
+                            "title": "Redeemed Armour Recipe missing - PC Discussion / PC Bug Reports - Funcom Forums",
+                            "url": "https://forums.funcom.com/t/redeemed-armour-recipe-missing/265332/4",
+                        },
+                        "2104332086": {
+                            "groupId": 1777522509,
+                            "id": 2104332086,
+                            "index": 250,
+                            "lastAccessed": 1729970973527.503,
+                            "title": "Fashion Exiles! Let's see those outfits! ~ Vanilla only! - General Discussion / Creative Corner - Funcom Forums",
+                            "url": "https://forums.funcom.com/t/fashion-exiles-lets-see-those-outfits-vanilla-only/234664/72",
+                        },
+                        "2104332125": {
+                            "groupId": 1777522509,
+                            "id": 2104332125,
+                            "index": 251,
+                            "lastAccessed": 1729970970598.415,
+                            "title": "Xevyr's guide to Thralls - General Discussion / Creative Corner - Funcom Forums",
+                            "url": "https://forums.funcom.com/t/xevyrs-guide-to-thralls/249258",
+                        },
+                        "2104332182": {
+                            "id": 2104332182,
+                            "index": 253,
+                            "lastAccessed": 1729943261421.352,
+                            "title": "Página de búsqueda | Glovo",
+                            "url": "https://glovoapp.com/es/es/madrid/search-glovo/tarta%20cumplea%C3%B1os",
+                        },
+                        "2104332205": {
+                            "groupId": 1777522509,
+                            "id": 2104332205,
+                            "index": 248,
+                            "lastAccessed": 1729968920195.504,
+                            "title": "Age of Heroes Known Issues: Barkeepers, Crafters, Oh My - General Discussion / News and Announcements - Funcom Forums",
+                            "url": "https://forums.funcom.com/t/age-of-heroes-known-issues-barkeepers-crafters-oh-my/264570/326",
+                        },
+                        "2104332870": {
+                            "id": 2104332870,
+                            "index": 0,
+                            "lastAccessed": 1727531483687.389,
+                            "title": "💤 (82) Alex (según la ciencia) - YouTube",
+                            "url": "https://www.youtube.com/@AlexSegunlaciencia/videos",
+                        },
+                        "2104332873": {
+                            "id": 2104332873,
+                            "index": 1,
+                            "lastAccessed": 1712782341080.224,
+                            "title": "Harvard Business Review - YouTube",
+                            "url": "https://www.youtube.com/@harvardbusinessreview/videos",
+                        },
+                        "2104332876": {
+                            "id": 2104332876,
+                            "index": 2,
+                            "lastAccessed": 1712782627456.452,
+                            "title": "ByteByteGo - YouTube",
+                            "url": "https://www.youtube.com/@ByteByteGo/videos",
+                        },
+                        "2104332879": {
+                            "id": 2104332879,
+                            "index": 3,
+                            "lastAccessed": 1714222829310.07,
+                            "title": "Historia Militum - YouTube",
+                            "url": "https://www.youtube.com/@HistoriaMilitum/videos",
+                        }
+                    },
+                    "2104794961": {
+                        "2104300576": {
+                            "id": 2104300576,
+                            "index": 741,
+                            "lastAccessed": 1729364198818.772,
+                            "title": "x.com/OskSta/status/1798310423554658732",
+                            "url": "https://x.com/OskSta/status/1798310423554658732",
+                        },
+                        "2104333602": {
+                            "id": 2104333602,
+                            "index": 0,
+                            "lastAccessed": 1712077091523.49,
+                            "title": "WARNO Steam Key for PC - Buy now",
+                            "url": "https://uk.gamesplanet.com/game/warno-steam-key--5471-1?utm_campaign=weekly&utm_content=toptitle&utm_medium=email&utm_source=2022-01-21",
+                        },
+                        "2104333605": {
+                            "id": 2104333605,
+                            "index": 1,
+                            "lastAccessed": 1712077091559.031,
+                            "title": "Advanced Tactics: Gold - Game - Matrix Games",
+                            "url": "https://www.matrixgames.com/game/advanced-tactics-gold?utm_source=Matrix+Games+Master&utm_campaign=5c513a25d5-EMAIL_CAMPAIGN_22.04.22_MatrixGames&utm_medium=email&utm_term=0_d2dfdfd653-5c513a25d5-91521653",
+                        },
+                        "2104333608": {
+                            "id": 2104333608,
+                            "index": 2,
+                            "lastAccessed": 1712077091564.394,
+                            "title": "Panzer Corps 2 - Game - Matrix Games",
+                            "url": "https://www.matrixgames.com/game/panzer-corps-2",
+                        }
+                    }
+                }
+            }
+        ];
+
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return '';
+            const date = new Date(timestamp);
+            return date.toLocaleString();
+        }
+
+        function renderData() {
+            const container = document.getElementById('container');
+
+            // Process data
+            const windows = data[0].windows;
+            let windowIdx = 0;
+
+            for (const windowId in windows) {
+                windowIdx++;
+                const windowColorClass = `window-color-${windowIdx % 2 + 1}`;
+                const tabs = windows[windowId];
+
+                // Create window container
+                const windowElem = document.createElement('div');
+                windowElem.className = `window ${windowColorClass}`;
+
+                // Add window header
+                const windowHeader = document.createElement('div');
+                windowHeader.className = 'window-header';
+                windowHeader.innerHTML = `
+          <div>Window ${windowIdx} (ID: ${windowId})</div>
+          <div class="chevron">▼</div>
+        `;
+                windowHeader.addEventListener('click', () => {
+                    const content = windowHeader.nextElementSibling;
+                    content.classList.toggle('collapsed');
+                    const chevron = windowHeader.querySelector('.chevron');
+                    chevron.classList.toggle('up');
+                });
+
+                // Add window content
+                const windowContent = document.createElement('div');
+                windowContent.className = 'window-content';
+
+                // Process tabs by groups
+                const groups = {};
+                const standaloneTabIds = [];
+
+                // Identify groups and standalone tabs
+                for (const tabId in tabs) {
+                    const tab = tabs[tabId];
+                    if (tab.groupId) {
+                        if (!groups[tab.groupId]) {
+                            groups[tab.groupId] = [];
+                        }
+                        groups[tab.groupId].push(tabId);
+                    } else {
+                        standaloneTabIds.push(tabId);
+                    }
+                }
+
+                // Process groups
+                let groupIdx = 0;
+                for (const groupId in groups) {
+                    groupIdx++;
+                    const groupColorClass = `group-color-${groupIdx % 3 + 1}`;
+
+                    const groupElem = document.createElement('div');
+                    groupElem.className = `group ${groupColorClass}`;
+
+                    const groupHeader = document.createElement('div');
+                    groupHeader.className = 'group-header';
+                    groupHeader.innerHTML = `
+            <div>Group (ID: ${groupId})</div>
+            <div class="chevron">▼</div>
+          `;
+                    groupHeader.addEventListener('click', () => {
+                        const content = groupHeader.nextElementSibling;
+                        content.classList.toggle('collapsed');
+                        const chevron = groupHeader.querySelector('.chevron');
+                        chevron.classList.toggle('up');
+                    });
+
+                    const groupContent = document.createElement('div');
+                    groupContent.className = 'group-content';
+
+                    // Add tabs to group
+                    groups[groupId].forEach(tabId => {
+                        const tab = tabs[tabId];
+                        const tabElem = createTabElement(tab);
+                        groupContent.appendChild(tabElem);
+                    });
+
+                    groupElem.appendChild(groupHeader);
+                    groupElem.appendChild(groupContent);
+                    windowContent.appendChild(groupElem);
+                }
+
+                // Process standalone tabs
+                standaloneTabIds.forEach(tabId => {
+                    const tab = tabs[tabId];
+                    const tabElem = createTabElement(tab, true);
+                    windowContent.appendChild(tabElem);
+                });
+
+                windowElem.appendChild(windowHeader);
+                windowElem.appendChild(windowContent);
+                container.appendChild(windowElem);
+            }
+        }
+
+        function createTabElement(tab, isStandalone = false) {
+            const tabElem = document.createElement('div');
+            tabElem.className = `tab ${isStandalone ? 'standalone-tab' : ''}`;
+
+            tabElem.innerHTML = `
+        <div class="tab-icon"></div>
+        <div class="tab-title" title="${tab.title}">${tab.title}</div>
+        <div class="tab-url" title="${tab.url}">${tab.url.length > 40 ? tab.url.substring(0, 40) + '...' : tab.url}</div>
+        <div class="timestamp">${formatTimestamp(tab.lastAccessed)}</div>
+      `;
+
+            return tabElem;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', renderData);
+    </script>
+</body>
+
+</html>
