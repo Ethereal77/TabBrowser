@@ -268,7 +268,7 @@ function createTabElement(tab, isStandalone = false, searchTerm = '', windowId =
     return tabElem;
 }
 
-function validateAndLoadData() {
+async function validateAndLoadData() {
     const jsonInput = document.getElementById('jsonInput').value.trim();
     const errorMessageElem = document.getElementById('errorMessage');
     const loadingIndicator = document.getElementById('loadingIndicator');
@@ -290,88 +290,74 @@ function validateAndLoadData() {
         progressBar.style.width = '10%';
         loadingDetails.textContent = 'Parsing JSON data...';
 
-        // Use setTimeout to allow the UI to update before processing
-        setTimeout(() => {
-            try {
-                const data = JSON.parse(jsonInput);
-                progressBar.style.width = '30%';
-                loadingDetails.textContent = 'Validating data structure...';
+        await new Promise(resolve => setTimeout(resolve, 100));
 
-                setTimeout(() => {
-                    try {
-                        // Validate basic structure
-                        if (!Array.isArray(data) || !data[0] || !data[0].windows) {
-                            throw new Error('Invalid data format. Expected an array with a "windows" object.');
-                        }
+        const data = JSON.parse(jsonInput);
+        progressBar.style.width = '30%';
+        loadingDetails.textContent = 'Validating data structure...';
 
-                        progressBar.style.width = '50%';
-                        loadingDetails.textContent = 'Analyzing windows and tabs...';
+        await new Promise(resolve => setTimeout(resolve, 300));
 
-                        setTimeout(() => {
-                            try {
-                                // Count windows and tabs for stats
-                                const windows = data[0].windows;
-                                let windowCount = 0;
-                                let tabCount = 0;
-                                let groupCount = 0;
-                                const groups = new Set();
+        // Validate basic structure
+        if (!Array.isArray(data) || !data[0] || !data[0].windows) {
+            throw new Error('Invalid data format. Expected an array with a "windows" object.');
+        }
 
-                                for (const windowId in windows) {
-                                    windowCount++;
-                                    const tabs = windows[windowId];
+        progressBar.style.width = '50%';
+        loadingDetails.textContent = 'Analyzing windows and tabs...';
 
-                                    for (const tabId in tabs) {
-                                        tabCount++;
-                                        const tab = tabs[tabId];
-                                        if (tab.groupId) {
-                                            groups.add(tab.groupId);
-                                        }
-                                    }
-                                }
+        await new Promise(resolve => setTimeout(resolve, 300));
 
-                                groupCount = groups.size;
+        // Count windows and tabs for stats
+        const windows = data[0].windows;
+        let windowCount = 0;
+        let tabCount = 0;
+        let groupCount = 0;
+        const groups = new Set();
 
-                                progressBar.style.width = '70%';
-                                loadingDetails.textContent = `Found ${windowCount} windows, ${groupCount} groups, and ${tabCount} tabs...`;
+        for (const windowId in windows) {
+            windowCount++;
+            const tabs = windows[windowId];
 
-                                setTimeout(() => {
-                                    // Update global data
-                                    currentData = data;
-
-                                    progressBar.style.width = '90%';
-                                    loadingDetails.textContent = 'Preparing visualization...';
-
-                                    setTimeout(() => {
-                                        // Switch to visualization section
-                                        document.getElementById('inputSection').style.display = 'none';
-                                        document.getElementById('visualizationSection').style.display = 'block';
-
-                                        // Render the data
-                                        renderData();
-
-                                        // Complete the progress bar
-                                        progressBar.style.width = '100%';
-
-                                        // Hide loading indicator after a small delay
-                                        setTimeout(() => {
-                                            loadingIndicator.style.display = 'none';
-                                            // Reset progress for next time
-                                            progressBar.style.width = '0%';
-                                        }, 200);
-                                    }, 200);
-                                }, 200);
-                            } catch (error) {
-                                handleLoadingError(error);
-                            }
-                        }, 300);
-                    } catch (error) {
-                        handleLoadingError(error);
-                    }
-                }, 300);
-            } catch (error) {
-                handleLoadingError(error);
+            for (const tabId in tabs) {
+                tabCount++;
+                const tab = tabs[tabId];
+                if (tab.groupId) {
+                    groups.add(tab.groupId);
+                }
             }
-        }, 100);
+        }
+
+        groupCount = groups.size;
+
+        progressBar.style.width = '70%';
+        loadingDetails.textContent = `Found ${windowCount} windows, ${groupCount} groups, and ${tabCount} tabs...`;
+
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        // Update global data
+        currentData = data;
+
+        progressBar.style.width = '90%';
+        loadingDetails.textContent = 'Preparing visualization...';
+
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        // Switch to visualization section
+        document.getElementById('inputSection').style.display = 'none';
+        document.getElementById('visualizationSection').style.display = 'block';
+
+        // Render the data
+        renderData();
+
+        // Complete the progress bar
+        progressBar.style.width = '100%';
+
+        // Hide loading indicator after a small delay
+        await new Promise(resolve => setTimeout(resolve, 200));
+        loadingIndicator.style.display = 'none';
+        // Reset progress for next time
+        progressBar.style.width = '0%';
     } catch (error) {
         handleLoadingError(error);
     }
