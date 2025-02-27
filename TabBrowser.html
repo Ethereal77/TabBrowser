@@ -22,6 +22,35 @@
             color: #444;
         }
 
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .search-bar {
+            width: 60%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .search-bar:focus {
+            border-color: #4285f4;
+            box-shadow: 0 2px 10px rgba(66, 133, 244, 0.3);
+        }
+
+        .search-stats {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
         .container {
             display: flex;
             flex-direction: column;
@@ -130,6 +159,22 @@
             margin-left: 10px;
         }
 
+        .highlight {
+            background-color: #fff9c4;
+            font-weight: bold;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.1rem;
+            color: #666;
+        }
+
         /* Window colors */
         .window-color-1 .window-header {
             background-color: #4285f4;
@@ -181,7 +226,15 @@
 
 <body>
     <h1>Browser Windows & Tabs</h1>
+
+    <div class="search-container">
+        <input type="text" id="searchBar" class="search-bar" placeholder="Search for tabs by title or URL...">
+    </div>
+
+    <div id="searchStats" class="search-stats"></div>
+
     <div class="container" id="container"></div>
+    <div id="noResults" class="no-results hidden">No tabs match your search.</div>
 
     <script>
         const data = [
@@ -335,17 +388,44 @@
             return date.toLocaleString();
         }
 
-        function renderData() {
+        // Helper function to highlight the matching text
+        function highlightText(text, searchTerm) {
+            if (!searchTerm) return text;
+
+            const regex = new RegExp(`(${searchTerm})`, 'gi');
+            return text.replace(regex, '<span class="highlight">$1</span>');
+        }
+
+        // Function to check if a tab matches the search query
+        function tabMatchesSearch(tab, searchTerm) {
+            if (!searchTerm) return true;
+
+            const searchLower = searchTerm.toLowerCase();
+            return (
+                tab.title.toLowerCase().includes(searchLower) ||
+                tab.url.toLowerCase().includes(searchLower)
+            );
+        }
+
+        function renderData(searchTerm = '') {
             const container = document.getElementById('container');
+            const noResultsElem = document.getElementById('noResults');
+            const searchStatsElem = document.getElementById('searchStats');
+
+            // Clear previous content
+            container.innerHTML = '';
 
             // Process data
             const windows = data[0].windows;
             let windowIdx = 0;
+            let totalTabsFound = 0;
+            let totalTabs = 0;
 
             for (const windowId in windows) {
                 windowIdx++;
                 const windowColorClass = `window-color-${windowIdx % 2 + 1}`;
                 const tabs = windows[windowId];
+                let windowHasVisibleTabs = false;
 
                 // Create window container
                 const windowElem = document.createElement('div');
@@ -376,6 +456,8 @@
                 // Identify groups and standalone tabs
                 for (const tabId in tabs) {
                     const tab = tabs[tabId];
+                    totalTabs++;
+
                     if (tab.groupId) {
                         if (!groups[tab.groupId]) {
                             groups[tab.groupId] = [];
@@ -411,39 +493,96 @@
                     const groupContent = document.createElement('div');
                     groupContent.className = 'group-content';
 
+                    // Track if the group has any visible tabs after filtering
+                    let groupHasVisibleTabs = false;
+
                     // Add tabs to group
                     groups[groupId].forEach(tabId => {
                         const tab = tabs[tabId];
-                        const tabElem = createTabElement(tab);
-                        groupContent.appendChild(tabElem);
+                        const isVisible = tabMatchesSearch(tab, searchTerm);
+
+                        if (isVisible) {
+                            totalTabsFound++;
+                            groupHasVisibleTabs = true;
+                            windowHasVisibleTabs = true;
+
+                            const tabElem = createTabElement(tab, false, searchTerm);
+                            groupContent.appendChild(tabElem);
+                        }
                     });
 
-                    groupElem.appendChild(groupHeader);
-                    groupElem.appendChild(groupContent);
-                    windowContent.appendChild(groupElem);
+                    // Only add the group if it has visible tabs
+                    if (groupHasVisibleTabs) {
+                        groupElem.appendChild(groupHeader);
+                        groupElem.appendChild(groupContent);
+                        windowContent.appendChild(groupElem);
+
+                        // Auto-expand groups when searching
+                        if (searchTerm) {
+                            groupContent.classList.remove('collapsed');
+                            groupHeader.querySelector('.chevron').classList.add('up');
+                        }
+                    }
                 }
 
                 // Process standalone tabs
                 standaloneTabIds.forEach(tabId => {
                     const tab = tabs[tabId];
-                    const tabElem = createTabElement(tab, true);
-                    windowContent.appendChild(tabElem);
+                    const isVisible = tabMatchesSearch(tab, searchTerm);
+
+                    if (isVisible) {
+                        totalTabsFound++;
+                        windowHasVisibleTabs = true;
+
+                        const tabElem = createTabElement(tab, true, searchTerm);
+                        windowContent.appendChild(tabElem);
+                    }
                 });
 
-                windowElem.appendChild(windowHeader);
-                windowElem.appendChild(windowContent);
-                container.appendChild(windowElem);
+                // Only add the window if it has visible tabs
+                if (windowHasVisibleTabs) {
+                    windowElem.appendChild(windowHeader);
+                    windowElem.appendChild(windowContent);
+                    container.appendChild(windowElem);
+
+                    // Auto-expand windows when searching
+                    if (searchTerm) {
+                        windowContent.classList.remove('collapsed');
+                        windowHeader.querySelector('.chevron').classList.add('up');
+                    }
+                }
+            }
+
+            // Update search stats
+            if (searchTerm) {
+                searchStatsElem.textContent = `Found ${totalTabsFound} matching tabs out of ${totalTabs} total tabs`;
+                searchStatsElem.classList.remove('hidden');
+            } else {
+                searchStatsElem.textContent = '';
+                searchStatsElem.classList.add('hidden');
+            }
+
+            // Show no results message if needed
+            if (totalTabsFound === 0 && searchTerm) {
+                noResultsElem.classList.remove('hidden');
+            } else {
+                noResultsElem.classList.add('hidden');
             }
         }
 
-        function createTabElement(tab, isStandalone = false) {
+        function createTabElement(tab, isStandalone = false, searchTerm = '') {
             const tabElem = document.createElement('div');
             tabElem.className = `tab ${isStandalone ? 'standalone-tab' : ''}`;
 
+            // Highlight the matching text parts if there's a search term
+            const highlightedTitle = highlightText(tab.title, searchTerm);
+            const displayUrl = tab.url.length > 40 ? tab.url.substring(0, 40) + '...' : tab.url;
+            const highlightedUrl = highlightText(displayUrl, searchTerm);
+
             tabElem.innerHTML = `
         <div class="tab-icon"></div>
-        <div class="tab-title" title="${tab.title}">${tab.title}</div>
-        <div class="tab-url" title="${tab.url}">${tab.url.length > 40 ? tab.url.substring(0, 40) + '...' : tab.url}</div>
+        <div class="tab-title" title="${tab.title}">${highlightedTitle}</div>
+        <div class="tab-url" title="${tab.url}">${highlightedUrl}</div>
         <div class="timestamp">${formatTimestamp(tab.lastAccessed)}</div>
       `;
 
@@ -451,7 +590,25 @@
         }
 
         // Initialize
-        document.addEventListener('DOMContentLoaded', renderData);
+        document.addEventListener('DOMContentLoaded', () => {
+            renderData();
+
+            // Set up search functionality
+            const searchBar = document.getElementById('searchBar');
+
+            searchBar.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.trim();
+                renderData(searchTerm);
+            });
+
+            // Clear search when pressing Escape
+            searchBar.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    searchBar.value = '';
+                    renderData();
+                }
+            });
+        });
     </script>
 </body>
 
