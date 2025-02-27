@@ -185,6 +185,15 @@
             white-space: nowrap;
         }
 
+        .tab-url a {
+            color: #4285f4;
+            text-decoration: none;
+        }
+
+        .tab-url a:hover {
+            text-decoration: underline;
+        }
+
         .chevron {
             transition: transform 0.3s ease;
         }
@@ -594,12 +603,42 @@
             // Highlight the matching text parts if there's a search term
             const highlightedTitle = highlightText(tab.title || 'Untitled', searchTerm);
             const displayUrl = tab.url ? (tab.url.length > 40 ? tab.url.substring(0, 40) + '...' : tab.url) : 'No URL';
-            const highlightedUrl = highlightText(displayUrl, searchTerm);
+
+            // Create clickable URL (without highlighting for the link element)
+            let urlHtml;
+            if (tab.url) {
+                // Create a safe URL element
+                const urlElement = document.createElement('a');
+                urlElement.href = tab.url;
+                urlElement.textContent = displayUrl;
+                urlElement.target = "_blank";
+                urlElement.rel = "noopener noreferrer";
+
+                // If there's a search term, we need to highlight it but keep the link
+                if (searchTerm) {
+                    // Create a temporary div to hold the highlighted URL
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = highlightText(displayUrl, searchTerm);
+
+                    // Extract the highlighted text
+                    const highlightedHtml = tempDiv.innerHTML;
+
+                    // Create a wrapper with the link that contains the highlighted HTML
+                    urlHtml = `<a href="${tab.url}" target="_blank" rel="noopener noreferrer">${highlightedHtml}</a>`;
+                } else {
+                    // No search term, just use the link
+                    const tempDiv = document.createElement('div');
+                    tempDiv.appendChild(urlElement);
+                    urlHtml = tempDiv.innerHTML;
+                }
+            } else {
+                urlHtml = 'No URL';
+            }
 
             tabElem.innerHTML = `
         <div class="tab-icon"></div>
         <div class="tab-title" title="${tab.title || 'Untitled'}">${highlightedTitle}</div>
-        <div class="tab-url" title="${tab.url || ''}">${highlightedUrl}</div>
+                <div class="tab-url" title="${tab.url || ''}">${urlHtml}</div>
         <div class="timestamp">${formatTimestamp(tab.lastAccessed)}</div>
       `;
 
