@@ -32,6 +32,11 @@ function tabMatchesSearch(tab, searchTerm) {
     );
 }
 
+function updateTabWindowCount(totalTabsFound, windowIdx, totalSelectedTabs) {
+    const tabWindowCountElem = document.getElementById('tabWindowCount');
+    tabWindowCountElem.textContent = `Displaying ${totalTabsFound} tabs in ${windowIdx} windows (${totalSelectedTabs} selected)`;
+}
+
 function renderData(searchTerm = '') {
     if (!currentData)
         return;
@@ -39,7 +44,6 @@ function renderData(searchTerm = '') {
     const container = document.getElementById('container');
     const noResultsElem = document.getElementById('noResults');
     const searchStatsElem = document.getElementById('searchStats');
-    const tabWindowCountElem = document.getElementById('tabWindowCount');
 
     // Clear previous content
     container.innerHTML = '';
@@ -206,7 +210,7 @@ function renderData(searchTerm = '') {
     }
 
     // Update tab and window count
-    tabWindowCountElem.textContent = `Displaying ${totalTabsFound} tabs in ${windowIdx} windows`;
+    updateTabWindowCount(totalTabsFound, windowIdx, 0);
 }
 
 function createTabElement(tab, isStandalone = false, searchTerm = '', windowId = null, groupId = null) {
@@ -465,6 +469,11 @@ function initialize() {
             const checked = e.target.checked;
             e.target.closest('.tab').classList.toggle('selected', checked);
         }
+
+        const totalSelectedTabs = document.querySelectorAll('.tab-checkbox:checked').length;
+        const totalTabsFound = document.querySelectorAll('.tab').length;
+        const windowIdx = document.querySelectorAll('.window').length;
+        updateTabWindowCount(totalTabsFound, windowIdx, totalSelectedTabs);
     });
 }
 
