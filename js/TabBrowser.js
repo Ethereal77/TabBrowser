@@ -750,7 +750,9 @@ function deleteSelectedTabs() {
 
     const selectedTabCheckboxes = document.querySelectorAll('.tab-checkbox:checked')
     selectedTabCheckboxes.forEach(checkbox => {
+
         const tabElem = checkbox.closest('.tab')
+
         const windowId = tabElem.getAttribute('data-window-id')
         const groupId = tabElem.getAttribute('data-group-id')
         const tabId = tabElem.getAttribute('data-tab-id')
@@ -760,29 +762,62 @@ function deleteSelectedTabs() {
 
         // Remove tab element from DOM
         tabElem.remove()
-
         // If no more tabs in the group, remove the group
-        if (groupId) {
-            const groupElem = document.querySelector(`.group[data-group-id="${groupId}"]`)
-            const groupTabs = groupElem.querySelectorAll('.tab')
-            if (groupTabs.length === 0) {
-                groupElem.remove()
-            }
-        }
-
+        if (groupId)
+            deleteGroup(groupId)
         // If no more tabs in the window, remove the window
-        if (windowId) {
-            const windowElem = document.querySelector(`.window[data-window-id="${windowId}"]`)
-            const windowTabs = windowElem.querySelectorAll('.tab')
-            if (windowTabs.length === 0) {
-                delete currentData[0].windows[windowId]
-                windowElem.remove()
-            }
-        }
+        if (windowId)
+            deleteWindow(windowId)
+    })
+
+    // Look also for selected windows even if they have no tabs
+    const selectedWindowCheckboxes = document.querySelectorAll('.window-checkbox:checked')
+    selectedWindowCheckboxes.forEach(checkbox => {
+        const windowElem = checkbox.closest('.window')
+        const windowId = windowElem.getAttribute('data-window-id')
+        deleteEmptyWindow(windowElem, windowId)
     })
 
     // Re-render data to update counts and visibility
     renderData()
+}
+
+/**
+ * Deletes a group from the visualization if empty.
+ *
+ * @param {string} groupId A string representing the tab group Id.
+ */
+function deleteGroup(groupId) {
+
+    const groupElem = document.querySelector(`.group[data-group-id="${groupId}"]`)
+    const groupTabs = groupElem.querySelectorAll('.tab')
+
+    if (groupTabs.length === 0)
+        groupElem.remove()
+}
+
+/**
+ * Deletes a window from the visualization and the data if empty.
+ *
+ * @param {string} windowId A string representing the tab window Id.
+ */
+function deleteWindow(windowId) {
+
+    const windowElem = document.querySelector(`.window[data-window-id="${windowId}"]`)
+    const windowTabs = windowElem.querySelectorAll('.tab')
+
+    if (windowTabs.length === 0)
+        deleteEmptyWindow(windowElem, windowId)
+}
+
+/**
+ * Deletes an empty window from the visualization and the data.
+ *
+ * @param {string} windowId A string representing the tab window Id.
+ */
+function deleteEmptyWindow(windowElem, windowId) {
+    delete currentData[0].windows[windowId]
+    windowElem.remove()
 }
 
 // ----------------- Add Window -----------------
