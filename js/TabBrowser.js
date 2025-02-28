@@ -190,10 +190,8 @@ const tabWindowCountElem = document.getElementById('tabWindowCount');
  */
 function initializeVisualization() {
 
-    document.getElementById('backToInput').addEventListener('click', () => {
-        inputSection.style.display = 'block';
-        visualizationSection.style.display = 'none';
-    });
+    document.getElementById('backToInput').addEventListener('click', backToInput);
+
     document.getElementById('expandAllBtn').addEventListener('click', expandAll);
     document.getElementById('collapseAllBtn').addEventListener('click', collapseAll);
 
@@ -493,6 +491,18 @@ function formatTimestamp(timestamp) {
 
     const date = new Date(timestamp);
     return date.toLocaleString();
+}
+
+/**
+ * Hides the visualization section and goes back to the input data section.
+ */
+function backToInput() {
+
+    // Clears any search prior to abandoning this view
+    cancelSearch();
+
+    inputSection.style.display = 'block';
+    visualizationSection.style.display = 'none';
 }
 
 // ----------------- Search -----------------
