@@ -13,6 +13,11 @@
 <body>
     <h1>Browser Windows & Tabs Visualizer</h1>
 
+    <!--
+        Input Section
+        - Textarea for pasting JSON data.
+        - Buttons for loading data, loading sample data, clearing input, and loading JSON file.
+    -->
     <div class="input-section" id="inputSection">
         <h2>Enter Browser Data</h2>
         <p>Paste your JSON data below. The structure should match the example format shown.</p>
@@ -36,6 +41,11 @@
         <input type="file" id="fileInput" class="hidden" accept=".json">
     </div>
 
+    <!--
+        Loading Indicator
+        - Displayed while processing data.
+        - Progress bar and details for loading status.
+    -->
     <div id="loadingIndicator" class="loading">
         <div>Processing data...</div>
         <div class="progress-container">
@@ -44,7 +54,17 @@
         <div id="loadingDetails" class="loading-details">Analyzing browser data structure...</div>
     </div>
 
+    <!--
+        Visualization Section
+        - Toolbar with buttons for adding windows and tabs, deleting selected items, and managing selection.
+        - Search bar for filtering tabs by title or URL.
+        - Stats for search results and total tab/window count.
+        - Container for displaying windows and tabs.
+        - Button group for returning to input and showing JSON data.
+    -->
     <div class="visualization-section" id="visualizationSection">
+
+        <!-- Toolbar for primary actions -->
         <div class="toolbar">
             <button id="addWindowBtn" class="button secondary">
                 <i class="icon icon-add-window"></i> Add New Window
@@ -69,6 +89,7 @@
             </button>
         </div>
 
+        <!-- Search bar and stats -->
         <div class="search-container">
             <input type="text" id="searchBar" class="search-bar" placeholder="Search for tabs by title or URL...">
         </div>
@@ -77,9 +98,11 @@
 
         <div id="tabWindowCount" class="tab-window-count"></div>
 
+        <!-- Container for displaying windows and tabs -->
         <div class="container" id="container"></div>
         <div id="noResults" class="no-results hidden">No tabs match your search.</div>
 
+        <!-- Buttons for secondary actions (returning to input, showing JSON data) -->
         <div class="button-group" style="margin-top: 20px;">
             <button id="backToInput" class="button secondary">
                 <i class="icon icon-back"></i> Back to Input
@@ -88,28 +111,18 @@
                 <i class="icon icon-show-json"></i> Show JSON Data
             </button>
         </div>
-
-        <div id="jsonDataModal" class="modal hidden">
-            <div class="modal-content">
-                <span class="close" id="closeJsonModal">&times;</span>
-                <h2>Current JSON Data</h2>
-                <textarea id="jsonDataOutput" class="json-output" readonly></textarea>
-                <div class="button-group">
-                    <button id="copyJsonBtn" class="button secondary">
-                        <i class="icon icon-copy"></i> Copy JSON
-                    </button>
-                    <button id="downloadJsonBtn" class="button secondary">
-                        <i class="icon icon-download"></i> Download JSON
-                    </button>
-                </div>
-            </div>
-        </div>
     </div>
 
+    <!--
+        Modal for adding new tabs
+        - Displayed when `addTabBtn` button is clicked.
+    -->
     <div id="addTabModal" class="modal hidden">
         <div class="modal-content">
             <span class="close" id="closeAddTabModal">&times;</span>
+
             <h2>Add New Tab</h2>
+
             <form id="addTabForm">
                 <label>
                     Tab Name:
@@ -125,6 +138,29 @@
                 </label>
                 <button type="submit" class="button">Add Tab</button>
             </form>
+        </div>
+    </div>
+
+    <!--
+        Modal for displaying current JSON data, copy it to clipboard, or download it as a file.
+        - Displayed when `showJsonBtn` button is clicked.
+    -->
+    <div id="jsonDataModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close" id="closeJsonModal">&times;</span>
+
+            <h2>Current JSON Data</h2>
+
+            <textarea id="jsonDataOutput" class="json-output" readonly></textarea>
+
+            <div class="button-group">
+                <button id="copyJsonBtn" class="button secondary">
+                    <i class="icon icon-copy"></i> Copy JSON
+                </button>
+                <button id="downloadJsonBtn" class="button secondary">
+                    <i class="icon icon-download"></i> Download JSON
+                </button>
+            </div>
         </div>
     </div>
 
