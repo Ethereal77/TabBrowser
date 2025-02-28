@@ -74,6 +74,18 @@
 
         <div class="button-group" style="margin-top: 20px;">
             <button id="backToInput" class="button secondary">Back to Input</button>
+            <button id="showJsonBtn" class="button secondary">Show JSON Data</button>
+        </div>
+
+        <div id="jsonDataModal" class="modal hidden">
+            <div class="modal-content">
+                <span class="close" id="closeJsonModal">&times;</span>
+                <h2>Current JSON Data</h2>
+                <textarea id="jsonDataOutput" class="json-output" readonly></textarea>
+                <div class="button-group">
+                    <button id="copyJsonBtn" class="button secondary">Copy JSON</button>
+                </div>
+            </div>
         </div>
     </div>
 

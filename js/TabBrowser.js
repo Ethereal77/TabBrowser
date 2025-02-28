@@ -582,6 +582,29 @@ function handleFileLoad(event) {
     reader.readAsText(file);
 }
 
+function showJsonData() {
+    if (!currentData) {
+        alert('No data to display.');
+        return;
+    }
+
+    const jsonDataOutput = document.getElementById('jsonDataOutput');
+    jsonDataOutput.value = JSON.stringify(currentData, null, 2);
+
+    document.getElementById('jsonDataModal').classList.remove('hidden');
+}
+
+function closeJsonData() {
+    document.getElementById('jsonDataModal').classList.add('hidden');
+}
+
+function copyJsonData() {
+    const jsonDataOutput = document.getElementById('jsonDataOutput');
+    jsonDataOutput.select();
+    document.execCommand('copy');
+    alert('JSON data copied to clipboard.');
+}
+
 // Initialize
 function initialize() {
     // Set up button handlers
@@ -605,6 +628,9 @@ function initialize() {
         document.getElementById('fileInput').click();
     });
     document.getElementById('fileInput').addEventListener('change', handleFileLoad);
+    document.getElementById('showJsonBtn').addEventListener('click', showJsonData);
+    document.getElementById('closeJsonModal').addEventListener('click', closeJsonData);
+    document.getElementById('copyJsonBtn').addEventListener('click', copyJsonData);
 
     // Set up search functionality
     const searchBar = document.getElementById('searchBar');
