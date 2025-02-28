@@ -3,6 +3,26 @@ import sampleData from "./SampleData.js"
 // Global variable to hold the current data
 let currentData = null;
 
+// DOM elements
+const jsonInputElem = document.getElementById('jsonInput');
+const errorMessageElem = document.getElementById('errorMessage');
+const loadingIndicator = document.getElementById('loadingIndicator');
+const progressBar = document.getElementById('progressBar');
+const loadingDetails = document.getElementById('loadingDetails');
+
+const container = document.getElementById('container');
+const noResultsElem = document.getElementById('noResults');
+const searchStatsElem = document.getElementById('searchStats');
+
+const addTabModal = document.getElementById('addTabModal');
+const addTabWindowSelect = document.getElementById('windowSelect');
+
+const jsonDataModal = document.getElementById('jsonDataModal');
+const jsonDataOutput = document.getElementById('jsonDataOutput');
+
+const searchBar = document.getElementById('searchBar');
+
+
 function formatTimestamp(timestamp) {
     if (!timestamp)
         return '';
@@ -47,10 +67,6 @@ function renderData(searchTerm = '') {
     if (!currentData)
         return;
 
-    const container = document.getElementById('container');
-    const noResultsElem = document.getElementById('noResults');
-    const searchStatsElem = document.getElementById('searchStats');
-
     // Clear previous content
     container.innerHTML = '';
 
@@ -82,7 +98,9 @@ function renderData(searchTerm = '') {
             <div class="chevron">▼</div>
         `;
         windowHeader.addEventListener('click', (e) => {
-            if (e.target.classList.contains('window-checkbox')) return;
+            if (e.target.classList.contains('window-checkbox'))
+                return;
+
             const content = windowHeader.nextElementSibling;
             content.classList.toggle('collapsed');
             const chevron = windowHeader.querySelector('.chevron');
@@ -95,9 +113,9 @@ function renderData(searchTerm = '') {
 
         // Process tabs by groups
         const groups = {};
-        const standaloneTabIds = [];
+        const nonGroupedTabIds = [];
 
-        // Identify groups and standalone tabs
+        // Identify groups and non-grouped tabs
         for (const tabId in tabs) {
             const tab = tabs[tabId];
             totalTabs++;
@@ -108,7 +126,7 @@ function renderData(searchTerm = '') {
                 }
                 groups[tab.groupId].push(tabId);
             } else {
-                standaloneTabIds.push(tabId);
+                nonGroupedTabIds.push(tabId);
             }
         }
 
@@ -131,7 +149,9 @@ function renderData(searchTerm = '') {
                 <div class="chevron">▼</div>
             `;
             groupHeader.addEventListener('click', (e) => {
-                if (e.target.classList.contains('group-checkbox')) return;
+                if (e.target.classList.contains('group-checkbox'))
+                    return;
+
                 const content = groupHeader.nextElementSibling;
                 content.classList.toggle('collapsed');
                 const chevron = groupHeader.querySelector('.chevron');
@@ -173,8 +193,8 @@ function renderData(searchTerm = '') {
             }
         }
 
-        // Process standalone tabs
-        standaloneTabIds.forEach(tabId => {
+        // Process non-grouped tabs
+        nonGroupedTabIds.forEach(tabId => {
             const tab = tabs[tabId];
             const isVisible = tabMatchesSearch(tab, searchTerm);
 
@@ -190,6 +210,7 @@ function renderData(searchTerm = '') {
         // Only add the window if it has visible tabs or no tabs at all
         if (windowHasVisibleTabs || Object.keys(tabs).length === 0) {
             windowElem.appendChild(windowHeader);
+
             if (windowHasVisibleTabs) {
                 windowElem.appendChild(windowContent);
             } else {
@@ -225,12 +246,16 @@ function renderData(searchTerm = '') {
     updateTabWindowCount(totalTabsFound, windowIdx, 0);
 }
 
-function createTabElement(tab, isStandalone = false, searchTerm = '', windowId = null, groupId = null) {
+function createTabElement(tab, isNonGrouped = false, searchTerm = '', windowId = null, groupId = null) {
+
     const tabElem = document.createElement('div');
-    tabElem.className = `tab ${isStandalone ? 'standalone-tab' : ''}`;
+    tabElem.className = `tab ${isNonGrouped ? 'non-grouped-tab' : ''}`;
+
     tabElem.setAttribute('data-tab-id', tab.id);
-    if (windowId) tabElem.setAttribute('data-window-id', windowId);
-    if (groupId) tabElem.setAttribute('data-group-id', groupId);
+    if (windowId)
+        tabElem.setAttribute('data-window-id', windowId);
+    if (groupId)
+        tabElem.setAttribute('data-group-id', groupId);
 
     // Highlight the matching text parts if there's a search term
     const highlightedTitle = highlightText(tab.title || 'Untitled', searchTerm);
@@ -279,11 +304,7 @@ function createTabElement(tab, isStandalone = false, searchTerm = '', windowId =
 }
 
 async function validateAndLoadData() {
-    const jsonInput = document.getElementById('jsonInput').value.trim();
-    const errorMessageElem = document.getElementById('errorMessage');
-    const loadingIndicator = document.getElementById('loadingIndicator');
-    const progressBar = document.getElementById('progressBar');
-    const loadingDetails = document.getElementById('loadingDetails');
+    const jsonInput = jsonInputElem.value.trim();
 
     // Clear previous error
     errorMessageElem.style.display = 'none';
@@ -364,18 +385,22 @@ async function validateAndLoadData() {
         progressBar.style.width = '100%';
 
         // Hide loading indicator after a small delay
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise(resolve => setTimeout(resolve, 500));
         loadingIndicator.style.display = 'none';
+
         // Reset progress for next time
         progressBar.style.width = '0%';
+
+        // Remove input text for next time
+        clearInput();
+
     } catch (error) {
         handleLoadingError(error);
     }
 }
 
 function handleLoadingError(error) {
-    const loadingIndicator = document.getElementById('loadingIndicator');
-    const errorMessageElem = document.getElementById('errorMessage');
+    console.warn('Error:', error.message)
 
     loadingIndicator.style.display = 'none';
     errorMessageElem.textContent = `Error: ${error.message}. Please check your JSON format.`;
@@ -383,54 +408,45 @@ function handleLoadingError(error) {
 }
 
 function loadSampleData() {
-    document.getElementById('jsonInput').value = JSON.stringify(sampleData, null, 2);
+    jsonInputElem.value = JSON.stringify(sampleData, null, 2);
 }
 
 function clearInput() {
-    document.getElementById('jsonInput').value = '';
-    document.getElementById('errorMessage').style.display = 'none';
+    jsonInputElem.value = '';
+    errorMessageElem.style.display = 'none';
 }
 
 function expandAll() {
     const collapseElements = document.querySelectorAll('.window-content, .group-content');
     const chevrons = document.querySelectorAll('.chevron');
 
-    collapseElements.forEach(elem => {
-        elem.classList.remove('collapsed');
-    });
+    collapseElements.forEach(elem => elem.classList.remove('collapsed'));
 
-    chevrons.forEach(chevron => {
-        chevron.classList.add('up');
-    });
+    chevrons.forEach(chevron => chevron.classList.add('up'));
 }
 
 function collapseAll() {
     const collapseElements = document.querySelectorAll('.window-content, .group-content');
     const chevrons = document.querySelectorAll('.chevron');
 
-    collapseElements.forEach(elem => {
-        elem.classList.add('collapsed');
-    });
+    collapseElements.forEach(elem => elem.classList.add('collapsed'));
 
-    chevrons.forEach(chevron => {
-        chevron.classList.remove('up');
-    });
+    chevrons.forEach(chevron => chevron.classList.remove('up'));
 }
 
 function selectAll() {
     const windowCheckboxes = document.querySelectorAll('.window-checkbox');
-    windowCheckboxes.forEach(checkbox => {
-        checkbox.checked = true;
-    });
+    windowCheckboxes.forEach(checkbox => checkbox.checked = true);
+
     const groupCheckboxes = document.querySelectorAll('.group-checkbox');
-    groupCheckboxes.forEach(checkbox => {
-        checkbox.checked = true;
-    });
+    groupCheckboxes.forEach(checkbox => checkbox.checked = true);
+
     const tabCheckboxes = document.querySelectorAll('.tab-checkbox');
     tabCheckboxes.forEach(checkbox => {
         checkbox.checked = true;
         checkbox.closest('.tab').classList.add('selected');
     });
+
     const totalSelectedTabs = tabCheckboxes.length;
     const totalTabsFound = document.querySelectorAll('.tab').length;
     const windowIdx = document.querySelectorAll('.window').length;
@@ -439,18 +455,17 @@ function selectAll() {
 
 function selectNone() {
     const windowCheckboxes = document.querySelectorAll('.window-checkbox');
-    windowCheckboxes.forEach(checkbox => {
-        checkbox.checked = false;
-    });
+    windowCheckboxes.forEach(checkbox => checkbox.checked = false);
+
     const groupCheckboxes = document.querySelectorAll('.group-checkbox');
-    groupCheckboxes.forEach(checkbox => {
-        checkbox.checked = false;
-    });
+    groupCheckboxes.forEach(checkbox => checkbox.checked = false);
+
     const tabCheckboxes = document.querySelectorAll('.tab-checkbox');
     tabCheckboxes.forEach(checkbox => {
         checkbox.checked = false;
         checkbox.closest('.tab').classList.remove('selected');
     });
+
     const totalTabsFound = document.querySelectorAll('.tab').length;
     const windowIdx = document.querySelectorAll('.window').length;
     updateTabWindowCount(totalTabsFound, windowIdx, 0);
@@ -500,39 +515,14 @@ function addNewWindow() {
         return;
     }
 
-    const newWindowId = `window${Date.now()}`;
+    const newWindowId = `window-${Date.now()}`;
     currentData[0].windows[newWindowId] = {};
-    renderData();
-}
 
-function addNewTab() {
-    if (!currentData) {
-        alert('Please load data first.');
-        return;
-    }
-
-    const windowIds = Object.keys(currentData[0].windows);
-    if (windowIds.length === 0) {
-        alert('Please add a window first.');
-        return;
-    }
-
-    const windowId = windowIds[0]; // Add to the first window for simplicity
-    const newTabId = `tab${Date.now()}`;
-    currentData[0].windows[windowId][newTabId] = {
-        id: newTabId,
-        index: Object.keys(currentData[0].windows[windowId]).length,
-        lastAccessed: Date.now(),
-        title: 'New Tab',
-        url: 'about:blank'
-    };
     renderData();
 }
 
 function openAddTabModal() {
-    const modal = document.getElementById('addTabModal');
-    const windowSelect = document.getElementById('windowSelect');
-    windowSelect.innerHTML = '';
+    addTabWindowSelect.innerHTML = '';
 
     const windowIds = Object.keys(currentData[0].windows);
     windowIds.forEach(windowId => {
@@ -542,12 +532,11 @@ function openAddTabModal() {
         windowSelect.appendChild(option);
     });
 
-    modal.classList.remove('hidden');
+    addTabModal.classList.remove('hidden');
 }
 
 function closeAddTabModal() {
-    const modal = document.getElementById('addTabModal');
-    modal.classList.add('hidden');
+    addTabModal.classList.add('hidden');
 }
 
 function handleAddTabFormSubmit(event) {
@@ -572,12 +561,13 @@ function handleAddTabFormSubmit(event) {
 
 function handleFileLoad(event) {
     const file = event.target.files[0];
-    if (!file) return;
+    if (!file)
+        return;
 
     const reader = new FileReader();
     reader.onload = function(e) {
         const content = e.target.result;
-        document.getElementById('jsonInput').value = content;
+        jsonInputElem.value = content;
     };
     reader.readAsText(file);
 }
@@ -588,21 +578,23 @@ function showJsonData() {
         return;
     }
 
-    const jsonDataOutput = document.getElementById('jsonDataOutput');
     jsonDataOutput.value = JSON.stringify(currentData, null, 2);
 
-    document.getElementById('jsonDataModal').classList.remove('hidden');
+    jsonDataModal.classList.remove('hidden');
 }
 
 function closeJsonData() {
-    document.getElementById('jsonDataModal').classList.add('hidden');
+    jsonDataModal.classList.add('hidden');
 }
 
-function copyJsonData() {
-    const jsonDataOutput = document.getElementById('jsonDataOutput');
-    jsonDataOutput.select();
-    document.execCommand('copy');
-    alert('JSON data copied to clipboard.');
+async function copyJsonData() {
+    try {
+        await navigator.clipboard.writeText(jsonDataOutput.value);
+        alert('JSON data copied to clipboard.');
+
+    } catch (error) {
+        console.error('Failed to copy text: ', error);
+    }
 }
 
 function downloadJsonData() {
@@ -656,13 +648,10 @@ function initialize() {
     document.getElementById('downloadJsonBtn').addEventListener('click', downloadJsonData); // New event listener
 
     // Set up search functionality
-    const searchBar = document.getElementById('searchBar');
-
     searchBar.addEventListener('input', (e) => {
         const searchTerm = e.target.value.trim();
         renderData(searchTerm);
     });
-
     // Clear search when pressing Escape
     searchBar.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
@@ -671,24 +660,33 @@ function initialize() {
         }
     });
 
+    // Listen to any checkbox changes to update the counts
     document.addEventListener('change', (e) => {
+
         if (e.target.classList.contains('window-checkbox')) {
             const windowId = e.target.closest('.window').dataset.windowId;
             const checked = e.target.checked;
-            document.querySelectorAll(`.window[data-window-id="${windowId}"] .group-checkbox`).forEach(checkbox => {
-                checkbox.checked = checked;
-            });
-            document.querySelectorAll(`.tab[data-window-id="${windowId}"] .tab-checkbox`).forEach(checkbox => {
-                checkbox.checked = checked;
-                checkbox.closest('.tab').classList.toggle('selected', checked);
-            });
+
+            document.querySelectorAll(`.window[data-window-id="${windowId}"] .group-checkbox`)
+                .forEach(checkbox => checkbox.checked = checked);
+
+            document.querySelectorAll(`.tab[data-window-id="${windowId}"] .tab-checkbox`)
+                .forEach(checkbox => {
+                    checkbox.checked = checked;
+                    checkbox.closest('.tab').classList.toggle('selected', checked);
+                });
+
         } else if (e.target.classList.contains('group-checkbox')) {
+
             const groupId = e.target.closest('.group').dataset.groupId;
             const checked = e.target.checked;
-            document.querySelectorAll(`.tab[data-group-id="${groupId}"] .tab-checkbox`).forEach(checkbox => {
-                checkbox.checked = checked;
-                checkbox.closest('.tab').classList.toggle('selected', checked);
-            });
+
+            document.querySelectorAll(`.tab[data-group-id="${groupId}"] .tab-checkbox`)
+                .forEach(checkbox => {
+                    checkbox.checked = checked;
+                    checkbox.closest('.tab').classList.toggle('selected', checked);
+                });
+
         } else if (e.target.classList.contains('tab-checkbox')) {
             const checked = e.target.checked;
             e.target.closest('.tab').classList.toggle('selected', checked);
