@@ -20,10 +20,18 @@
         <textarea id="jsonInput" class="json-input"
             placeholder='Enter JSON with the structure: [{"windows": {"windowId": {"tabId": {"id": number, "index": number, "lastAccessed": number, "title": string, "url": string, "groupId"?: number}, ...}, ...}}]'></textarea>
         <div class="button-group">
-            <button id="loadBtn" class="button">Load Data</button>
-            <button id="loadSampleBtn" class="button secondary">Load Sample Data</button>
-            <button id="clearBtn" class="button secondary">Clear</button>
-            <button id="loadFileBtn" class="button secondary">Load JSON File</button>
+            <button id="loadBtn" class="button">
+                <i class="icon icon-load"></i> Load Data
+            </button>
+            <button id="loadSampleBtn" class="button secondary">
+                <i class="icon icon-load-sample"></i> Load Sample Data
+            </button>
+            <button id="clearBtn" class="button secondary">
+                <i class="icon icon-clear"></i> Clear
+            </button>
+            <button id="loadFileBtn" class="button secondary">
+                <i class="icon icon-load-file"></i> Load JSON File
+            </button>
         </div>
         <input type="file" id="fileInput" class="hidden" accept=".json">
     </div>
@@ -73,8 +81,12 @@
         <div id="noResults" class="no-results hidden">No tabs match your search.</div>
 
         <div class="button-group" style="margin-top: 20px;">
-            <button id="backToInput" class="button secondary">Back to Input</button>
-            <button id="showJsonBtn" class="button secondary">Show JSON Data</button>
+            <button id="backToInput" class="button secondary">
+                <i class="icon icon-back"></i> Back to Input
+            </button>
+            <button id="showJsonBtn" class="button secondary">
+                <i class="icon icon-show-json"></i> Show JSON Data
+            </button>
         </div>
 
         <div id="jsonDataModal" class="modal hidden">
@@ -83,8 +95,12 @@
                 <h2>Current JSON Data</h2>
                 <textarea id="jsonDataOutput" class="json-output" readonly></textarea>
                 <div class="button-group">
-                    <button id="copyJsonBtn" class="button secondary">Copy JSON</button>
-                    <button id="downloadJsonBtn" class="button secondary">Download JSON</button>
+                    <button id="copyJsonBtn" class="button secondary">
+                        <i class="icon icon-copy"></i> Copy JSON
+                    </button>
+                    <button id="downloadJsonBtn" class="button secondary">
+                        <i class="icon icon-download"></i> Download JSON
+                    </button>
                 </div>
             </div>
         </div>

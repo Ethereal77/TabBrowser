@@ -421,6 +421,38 @@ h1 {
     content: "\1F5D8"; /* New window icon */
 }
 
+.icon-load::before {
+    content: "\1F4E5"; /* Inbox tray icon */
+}
+
+.icon-load-sample::before {
+    content: "\1F4C4"; /* Page facing up icon */
+}
+
+.icon-clear::before {
+    content: "\1F5D1"; /* Trash can icon */
+}
+
+.icon-load-file::before {
+    content: "\1F4C2"; /* Open file folder icon */
+}
+
+.icon-copy::before {
+    content: "\1F4CB"; /* Clipboard icon */
+}
+
+.icon-download::before {
+    content: "\1F4E5"; /* Inbox tray icon */
+}
+
+.icon-back::before {
+    content: "\21A9"; /* Leftwards arrow with hook icon */
+}
+
+.icon-show-json::before {
+    content: "\1F4C8"; /* Bar chart icon */
+}
+
 .modal {
     position: fixed;
     z-index: 1000;
