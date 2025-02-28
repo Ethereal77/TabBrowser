@@ -71,12 +71,14 @@ function renderData(searchTerm = '') {
         windowElem.className = `window ${windowColorClass}`;
         windowElem.setAttribute('data-window-id', windowId);
 
-        // Add window header with checkbox
+        // Add window header with checkbox and tab count
         const windowHeader = document.createElement('div');
         windowHeader.className = 'window-header';
+        const tabCount = Object.keys(tabs).length;
+        const tabCountText = tabCount === 1 ? '1 tab' : `${tabCount} tabs`;
         windowHeader.innerHTML = `
             <input type="checkbox" class="window-checkbox">
-            <div>Window ${windowIdx} (ID: ${windowId})</div>
+            <div>Window ${windowIdx} (ID: ${windowId}) <span class="tab-count">(${tabCountText})</span></div>
             <div class="chevron">▼</div>
         `;
         windowHeader.addEventListener('click', (e) => {

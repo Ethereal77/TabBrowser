@@ -120,6 +120,12 @@ h1 {
     font-size: 1.1rem;
 }
 
+.window-header .tab-count {
+    font-size: 0.8rem;
+    color: #ddd;
+    margin-left: 10px;
+}
+
 .window-content {
     padding: 15px;
     display: flex;
@@ -297,6 +303,10 @@ h1 {
 
     .chevron {
         opacity: 0;
+    }
+
+    .tab-count {
+        color: #aaa;
     }
 }
 
