@@ -570,6 +570,18 @@ function handleAddTabFormSubmit(event) {
     renderData();
 }
 
+function handleFileLoad(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const content = e.target.result;
+        document.getElementById('jsonInput').value = content;
+    };
+    reader.readAsText(file);
+}
+
 // Initialize
 function initialize() {
     // Set up button handlers
@@ -589,6 +601,10 @@ function initialize() {
     document.getElementById('addTabBtn').addEventListener('click', openAddTabModal);
     document.getElementById('closeAddTabModal').addEventListener('click', closeAddTabModal);
     document.getElementById('addTabForm').addEventListener('submit', handleAddTabFormSubmit);
+    document.getElementById('loadFileBtn').addEventListener('click', () => {
+        document.getElementById('fileInput').click();
+    });
+    document.getElementById('fileInput').addEventListener('change', handleFileLoad);
 
     // Set up search functionality
     const searchBar = document.getElementById('searchBar');
